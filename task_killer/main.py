@@ -1,5 +1,12 @@
 from tkinter import *
-from aid_task_killer.parser import server_list
+from task_killer.parser import open_file, add_srv_in_txt
+
+
+def add_server():
+    new_server = server_entry.get()
+    server_list_listbox.insert(0, new_server)
+    add_srv_in_txt(new_server)
+
 
 # root this is our field
 root = Tk()
@@ -31,7 +38,7 @@ server_entry = Entry(frame_top, bg='#202020', width=30,
 server_entry.place(x=10, y=35, height=25, width=190)
 
 
-add_server_button = Button(frame_top, text='Add', bg='#202020',
+add_server_button = Button(frame_top, command=add_server, text='Add', bg='#202020',
                            fg='#C0C0C0')
 add_server_button.place(x=200, y=35, height=26, width=40)
 
@@ -41,7 +48,7 @@ frame_center = Frame(root, bg="#606060")
 frame_center.place(relwidth=1, height=250, y=75)
 
 
-servers = Variable(value=server_list)
+servers = Variable(value=open_file())
 server_list_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
                               bd=0, highlightbackground='#202020', fg='#C0C0C0',
                               font=30, selectbackground='#48BA6B')
