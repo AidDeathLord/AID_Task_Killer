@@ -17,9 +17,3 @@ def check_file():
     if not os.path.exists('server_list/servers.txt'):
         with open('server_list/servers.txt', 'x'):
             pass
-
-
-def add_srv_in_txt(srv):
-    file = open('server_list/servers.txt', 'a')
-    file.writelines(f'{srv}\n')
-

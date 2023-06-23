@@ -1,11 +1,25 @@
 from tkinter import *
-from task_killer.parser import open_file, add_srv_in_txt
+from tkinter import messagebox
+from task_killer.parser import open_file
+# from task_killer.funсtions import add_srv_in_txt
+
+
+INVALID_SYMBOLS = [' ', ':', '!', '<', '>', '"', '/', '\\', '|', '?', '*']
 
 
 def add_server():
     new_server = server_entry.get()
     server_list_listbox.insert(0, new_server)
     add_srv_in_txt(new_server)
+
+
+def add_srv_in_txt(new_srv):
+    srv_list = open_file()
+    if new_srv not in srv_list:
+        if INVALID_SYMBOLS in srv:
+            messagebox.showerror("Title", "Message")
+        else:
+            file.writelines(f'{srv}\n')
 
 
 # root this is our field
