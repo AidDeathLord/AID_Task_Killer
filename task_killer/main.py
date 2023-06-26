@@ -1,26 +1,38 @@
+import re
+import subprocess
 from tkinter import *
 from tkinter import messagebox
 from task_killer.parser import open_file
-# from task_killer.funсtions import add_srv_in_txt
-
-
-INVALID_SYMBOLS = [' ', ':', '!', '<', '>', '"', '/', '\\', '|', '?', '*']
 
 
 def add_server():
     new_server = server_entry.get()
-    server_list_listbox.insert(0, new_server)
-    add_srv_in_txt(new_server)
-
-
-def add_srv_in_txt(new_srv):
-    srv_list = open_file()
-    if new_srv not in srv_list:
-        if INVALID_SYMBOLS in srv:
-            messagebox.showerror("Title", "Message")
+    server_list = open_file()
+    if new_server in server_list:
+        open_server()
+    else:
+        if add_srv_in_txt(new_server):
+            server_listbox.insert(0, new_server)
+            open_server()
         else:
-            file.writelines(f'{srv}\n')
+            error_add_server()
 
+
+def add_srv_in_txt(new_server):
+    if subprocess.check_output(f"powershell.exe tnc {new_server} -I Quiet",
+                               universal_newlines=True) == 'True\n':
+        server_file = open('server_list/servers.txt', 'a')
+        server_file.writelines(f'{new_server}\n')
+        return True
+    return False
+
+
+def error_add_server():
+    messagebox.showerror(title="Error", message="Server is not available")
+
+
+def open_server():
+    messagebox.showerror(title="Error", message="open")
 
 # root this is our field
 root = Tk()
@@ -63,10 +75,10 @@ frame_center.place(relwidth=1, height=250, y=75)
 
 
 servers = Variable(value=open_file())
-server_list_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
-                              bd=0, highlightbackground='#202020', fg='#C0C0C0',
-                              font=30, selectbackground='#48BA6B')
-server_list_listbox.place(height=230, width=230, x=10, y=10)
+server_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
+                         bd=0, highlightbackground='#202020', fg='#C0C0C0',
+                         font=30, selectbackground='#48BA6B')
+server_listbox.place(height=230, width=230, x=10, y=10)
 
 
 # bottom panel
