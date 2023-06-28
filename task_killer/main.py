@@ -19,6 +19,8 @@ def add_server():
 
 
 def add_srv_in_txt(new_server):
+    if new_server == '':
+        return False
     if subprocess.check_output(f"powershell.exe tnc {new_server} -I Quiet",
                                universal_newlines=True) == 'True\n':
         server_file = open('server_list/servers.txt', 'a')
@@ -31,8 +33,26 @@ def error_add_server():
     messagebox.showerror(title="Error", message="Server is not available")
 
 
+def del_server():
+    # запоминаем индекс выбранного элемента
+    selection = server_listbox.curselection()
+    # запоминаем содержание элемента
+    selected_server = server_listbox.get(selection[0])
+
+    # удаляем элемент из формы
+    server_listbox.delete(selection[0])
+
+    # удаляем элемент из файла
+    server_list = open_file()
+    server_list.remove(str(selected_server))
+    server_file = open('server_list/servers.txt', 'w')
+    for server in server_list:
+        server_file.writelines(f'{server}\n')
+
+
 def open_server():
     messagebox.showerror(title="Error", message="open")
+
 
 # root this is our field
 root = Tk()
@@ -40,6 +60,7 @@ root = Tk()
 # set parameters for root
 root['bg'] = '#fafafa'  # background color
 root.title('ATK')  # title
+root.geometry('+800+300')
 root.resizable(width=False, height=False)
 
 icon = PhotoImage(file='image/logo.png')
@@ -86,7 +107,7 @@ frame_bottom = Frame(root, bg="#202020")
 frame_bottom.place(relwidth=1, height=80, y=325)
 
 del_server_button = Button(frame_bottom, text='Delete', bg='#202020',
-                           fg='#C0C0C0')
+                           fg='#C0C0C0', command=del_server)
 del_server_button.place(x=10, y=10, height=26, width=60)
 
 open_button = Button(frame_bottom, text='Open', bg='#202020',
