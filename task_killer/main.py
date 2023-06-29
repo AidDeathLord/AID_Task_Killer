@@ -1,24 +1,24 @@
-import re
 import subprocess
 from tkinter import *
 from tkinter import messagebox
 from task_killer.parser import open_file
+from task_killer.tasks_form import open_tasks
 
 
 def add_server():
     new_server = server_entry.get()
     server_list = open_file()
     if new_server in server_list:
-        open_server()
+        open_tasks(new_server)
     else:
         if add_srv_in_txt(new_server):
             server_listbox.insert(0, new_server)
-            open_server()
+            open_tasks(new_server)
         else:
             error_add_server()
 
 
-def add_srv_in_txt(new_server):
+def add_srv_in_txt(new_server: str) -> bool:
     if new_server == '':
         return False
     if subprocess.check_output(f"powershell.exe tnc {new_server} -I Quiet",
@@ -34,15 +34,15 @@ def error_add_server():
 
 
 def del_server():
-    # запоминаем индекс выбранного элемента
+    # remember the index of the selected element
     selection = server_listbox.curselection()
-    # запоминаем содержание элемента
+    # remember the content of the element
     selected_server = server_listbox.get(selection[0])
 
-    # удаляем элемент из формы
+    # remove element from form
     server_listbox.delete(selection[0])
 
-    # удаляем элемент из файла
+    # remove element from file
     server_list = open_file()
     server_list.remove(str(selected_server))
     server_file = open('server_list/servers.txt', 'w')
@@ -51,27 +51,31 @@ def del_server():
 
 
 def open_server():
-    messagebox.showerror(title="Error", message="open")
+    # remember the index of the selected element
+    selection = server_listbox.curselection()
+    # remember the content of the element
+    selected_server = server_listbox.get(selection[0])
+    open_tasks(selected_server)
 
 
 # root this is our field
-root = Tk()
+servers_form = Tk()
 
 # set parameters for root
-root['bg'] = '#fafafa'  # background color
-root.title('ATK')  # title
-root.geometry('+800+300')
-root.resizable(width=False, height=False)
+servers_form['bg'] = '#fafafa'  # background color
+servers_form.title('ATK')  # title
+servers_form.geometry('+800+300')
+servers_form.resizable(width=False, height=False)
 
 icon = PhotoImage(file='image/logo.png')
-root.iconphoto(False, icon)
+servers_form.iconphoto(False, icon)
 
-canvas = Canvas(root, height=370, width=250)
+canvas = Canvas(servers_form, height=370, width=250)
 canvas.pack()
 
 
 # top panel (add server)
-frame_top = Frame(root, bg="#202020")
+frame_top = Frame(servers_form, bg="#202020")
 frame_top.place(relwidth=1, height=75)
 
 
@@ -91,7 +95,7 @@ add_server_button.place(x=200, y=35, height=26, width=40)
 
 
 # center panel (server list)
-frame_center = Frame(root, bg="#606060")
+frame_center = Frame(servers_form, bg="#606060")
 frame_center.place(relwidth=1, height=250, y=75)
 
 
@@ -103,7 +107,7 @@ server_listbox.place(height=230, width=230, x=10, y=10)
 
 
 # bottom panel
-frame_bottom = Frame(root, bg="#202020")
+frame_bottom = Frame(servers_form, bg="#202020")
 frame_bottom.place(relwidth=1, height=80, y=325)
 
 del_server_button = Button(frame_bottom, text='Delete', bg='#202020',
@@ -111,7 +115,7 @@ del_server_button = Button(frame_bottom, text='Delete', bg='#202020',
 del_server_button.place(x=10, y=10, height=26, width=60)
 
 open_button = Button(frame_bottom, text='Open', bg='#202020',
-                     fg='#C0C0C0')
+                     fg='#C0C0C0', command=open_server)
 open_button.place(x=180, y=10, height=26, width=60)
 
-root.mainloop()
+servers_form.mainloop()
