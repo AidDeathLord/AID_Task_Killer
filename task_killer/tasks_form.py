@@ -7,13 +7,13 @@ def open_tasks(server):
     task_form.title(f"{server}")
 
     task_form['bg'] = '#fafafa'  # background color
-    task_form.geometry('+800+300')
+    task_form.geometry('+500+200')
     task_form.resizable(width=False, height=False)
 
     icon = PhotoImage(file='image/logo.png')
     task_form.iconphoto(False, icon)
 
-    canvas = Canvas(task_form, height=500, width=500)
+    canvas = Canvas(task_form, height=500, width=800)
     canvas.pack()
 
     frame = Frame(task_form, bg="#202020")
@@ -25,6 +25,7 @@ def open_tasks(server):
     table.place(x=10, y=10)
 
     table.heading('Program', text='Program')
+    table.column('Program', anchor=CENTER, stretch=NO, width=200)
     table.heading('PID', text='PID')
     table.heading('State', text='State')
     table.heading('Session', text='Session')
@@ -34,6 +35,6 @@ def open_tasks(server):
     tasks = [('qwe', 11, 'ewq'), (11, 22, 33, 44, 55, 66), (111, 222, 333, 444, 555, 666)]
 
     for i in tasks:
-        table.insert('', END, values=tasks)
+        table.insert('', END, values=i)
 
     task_form.mainloop()
