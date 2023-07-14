@@ -1,13 +1,13 @@
 import subprocess
 from tkinter import *
 from tkinter import messagebox
-from task_killer.parser import open_file
+from task_killer.parser import open_server_file
 from task_killer.tasks_form import open_tasks
 
 
 def add_server():
     new_server = server_entry.get()
-    server_list = open_file()
+    server_list = open_server_file()
     if new_server in server_list:
         open_tasks(new_server)
     else:
@@ -43,7 +43,7 @@ def del_server():
     server_listbox.delete(selection[0])
 
     # remove element from file
-    server_list = open_file()
+    server_list = open_server_file()
     server_list.remove(str(selected_server))
     server_file = open('server_list/servers.txt', 'w')
     for server in server_list:
@@ -99,7 +99,7 @@ frame_center = Frame(servers_form, bg="#606060")
 frame_center.place(relwidth=1, height=250, y=75)
 
 
-servers = Variable(value=open_file())
+servers = Variable(value=open_server_file())
 server_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
                          bd=0, highlightbackground='#202020', fg='#C0C0C0',
                          font=30, selectbackground='#48BA6B')

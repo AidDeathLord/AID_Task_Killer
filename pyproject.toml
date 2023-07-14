@@ -8,6 +8,7 @@ packages = [{include = "aid_task_killer"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+psutil = "^5.9.5"
 
 
 [tool.poetry.group.dev.dependencies]
