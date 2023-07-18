@@ -2,18 +2,18 @@ import subprocess
 from tkinter import *
 from tkinter import messagebox
 from task_killer.parser import open_server_file
-from task_killer.tasks_form import open_tasks
+from task_killer.tasks_form import open_form
 
 
 def add_server():
     new_server = server_entry.get()
     server_list = open_server_file()
     if new_server in server_list:
-        open_tasks(new_server)
+        open_form(new_server)
     else:
         if add_srv_in_txt(new_server):
             server_listbox.insert(0, new_server)
-            open_tasks(new_server)
+            open_form(new_server)
         else:
             error_add_server()
 
@@ -55,7 +55,7 @@ def open_server():
     selection = server_listbox.curselection()
     # remember the content of the element
     selected_server = server_listbox.get(selection[0])
-    open_tasks(selected_server)
+    open_form(selected_server)
 
 
 # root this is our field
@@ -70,7 +70,7 @@ servers_form.resizable(width=False, height=False)
 icon = PhotoImage(file='image/logo.png')
 servers_form.iconphoto(False, icon)
 
-canvas = Canvas(servers_form, height=370, width=250)
+canvas = Canvas(servers_form, height=370, width=246)
 canvas.pack()
 
 

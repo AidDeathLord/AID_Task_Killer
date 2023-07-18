@@ -26,9 +26,10 @@ def check_server_file():
 
 
 # opens tasks list on remote computer and outputs in the desired format
-def get_tasks():
+def get_tasks(server):
     # get tasks in str format
-    tasks = subprocess.check_output(f'powershell.exe Get-Process | Select-Object ProcessName, SI, Id |'
+    tasks = subprocess.check_output(f'powershell.exe Get-Process -ComputerName {server} | '
+                                    f'Select-Object ProcessName, SI, Id |'
                                     f' Format-Table -hidetableheaders', universal_newlines=True)
     tasks_list = tasks.split()
 
@@ -58,8 +59,9 @@ def get_tasks():
     return result
 
 
-def get_users():
-    users = subprocess.check_output(f'powershell.exe Get-TerminalSession | Select-Object Id, UserName |'
+def get_users(server):
+    users = subprocess.check_output(f'powershell.exe Get-TerminalSession -ComputerName {server}| '
+                                    f'Select-Object Id, UserName |'
                                     f' Format-Table -HideTableHeaders', universal_newlines=True)
     users_list = users.split()
 
