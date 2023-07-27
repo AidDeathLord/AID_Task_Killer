@@ -6,48 +6,47 @@ import subprocess
 
 def open_users(server):
     users_info = get_users(server)
-    result = []
-    for elem in users_info:
-        result.append(elem.get('User'))
-    return result
+    return list(users_info.keys())
 
 
 def open_form(server):
     def open_tasks():
-        selection = server_listbox.curselection()
+        selection = users_listbox.curselection()
         # remember the content of the element
-        selected_server = server_listbox.get(selection[0])
-        user_id = ''
-        users = get_users(server)
-        for i in users:
-            if i.get('User') == selected_server:
-                user_id = i.get('ID')
-        tasks = get_tasks(server)
-        for i in tasks:
-            if i.get('User') == user_id:
-                info = (i.get('Program'), i.get('PID'))
-                table.insert('', END, values=info)
+        selected_user = users_listbox.get(selection[0])
+
+        users_dict = get_users(server)
+        user_id = users_dict.get(selected_user)
+
+        tasks = get_tasks(server, user_id)
+        for elem in tasks:
+            table.insert('', END, values=elem)
 
     def close_task():
         selected_item = table.selection()[0]
         task = table.item(selected_item, option="values")
-        print(task)
-        process = subprocess.check_output(f'powershell.exe Get-Process -ID {task[1]} -ComputerName {server}',
-                                          universal_newlines=True)
-        # $RProc = Get - Process - Name
-        # notepad - ComputerName
-        # dc01
-        # Stop - Process - InputObject $RProc
-        print(process)
-        command = f'powershell.exe Stop-Process -InputObject {process}'
-        subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, creationflags=0x08000000)
+
+        command = f'''powershell.exe $process = Get-Process -ID {task[1]} -ComputerName {server}\n
+                      Stop-Process -InputObject $process'''
+        subprocess.call(command)
+        table.delete(selected_item)
+
+    def kick_user():
+        selection = users_listbox.curselection()
+        selected_user = users_listbox.get(selection[0])
+        users_dict = get_users(server)
+        user_id = users_dict.get(selected_user)
+
+        command = f'logoff {user_id} /server:{server}'
+        subprocess.call(command)
+        users_listbox.delete(selection)
 
     # tasks form
     task_form = Toplevel()
     task_form.title(f"{server}")
 
     task_form['bg'] = '#fafafa'  # background color
-    task_form.geometry('+500+200')
+    task_form.geometry('+600+300')
     task_form.resizable(width=False, height=False)
 
     icon = PhotoImage(file='image/logo.png')
@@ -74,11 +73,11 @@ def open_form(server):
     frame_center = Frame(task_form, bg="#606060")
     frame_center.place(relwidth=1, height=350, y=40)
 
-    servers = Variable(value=open_users(server))
-    server_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
-                             bd=0, highlightbackground='#202020', fg='#C0C0C0',
-                             font=30, selectbackground='#48BA6B')
-    server_listbox.place(height=330, width=280, x=10, y=10)
+    users = Variable(value=open_users(server))
+    users_listbox = Listbox(frame_center, listvariable=users, bg="#202020",
+                            bd=0, highlightbackground='#202020', fg='#C0C0C0',
+                            font=30, selectbackground='#48BA6B')
+    users_listbox.place(height=330, width=280, x=10, y=10)
 
     # add table
     columns = ('Program', 'PID')
@@ -106,8 +105,12 @@ def open_form(server):
                                fg='#C0C0C0', command=open_tasks)
     open_tasks_button.place(x=10, y=10, height=26, width=60)
 
-    open_tasks_button = Button(frame_bottom, text='Close', bg='#202020',
-                               fg='#C0C0C0', command=close_task)
-    open_tasks_button.place(x=430, y=10, height=26, width=60)
+    kick_user_button = Button(frame_bottom, text='Kick', bg='#202020',
+                              fg='#C0C0C0', command=kick_user)
+    kick_user_button.place(x=180, y=10, height=26, width=60)
+
+    close_tasks_button = Button(frame_bottom, text='Close', bg='#202020',
+                                fg='#C0C0C0', command=close_task)
+    close_tasks_button.place(x=430, y=10, height=26, width=60)
 
     task_form.mainloop()

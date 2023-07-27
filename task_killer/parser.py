@@ -26,54 +26,42 @@ def check_server_file():
 
 
 # opens tasks list on remote computer and outputs in the desired format
-def get_tasks(server):
+def get_tasks(server: str, user_id: str) -> list:
     # get tasks in str format
     tasks = subprocess.check_output(f'powershell.exe Get-Process -ComputerName {server} | '
-                                    f'Select-Object ProcessName, SI, Id |'
+                                    f'Where-Object {{$_.SI -like {user_id}}} | Select-Object ProcessName, Id |'
                                     f' Format-Table -hidetableheaders', universal_newlines=True)
     tasks_list = tasks.split()
-
     # lead information to dict format
     result = []
     index = 0
     while index < len(tasks_list):
-        task_dict = dict()
-        task_dict['Program'] = tasks_list[index]
+        task = list()
+        task.append(tasks_list[index])
+        index += 1
 
         # if there are processes consisting of several words
         # do a check, if the next element is not a number, add it to the previous one
-        index += 1
         if tasks_list[index][0] in NUMBERS:
-            task_dict['User'] = tasks_list[index]
+            task.append(tasks_list[index])
         else:
-            task_dict['Program'] = f"{task_dict.get('Program')} {tasks_list[index]}"
+            task[0] = f'{task[0]} {tasks_list[index]}'
             index += 1
-            task_dict['User'] = tasks_list[index]
+            task.append(tasks_list[index])
 
+        result.append(task)
         index += 1
-        task_dict['PID'] = tasks_list[index]
-
-        result.append(task_dict)
-        index += 1
-
     return result
 
 
-def get_users(server):
+def get_users(server: str) -> dict:
     users = subprocess.check_output(f'powershell.exe Get-TerminalSession -ComputerName {server}| '
-                                    f'Select-Object Id, UserName |'
+                                    f'Select-Object UserName, Id |'
                                     f' Format-Table -HideTableHeaders', universal_newlines=True)
     users_list = users.split()
-
-    result = []
+    result = dict()
     index = 1
     while index < len(users_list) - 1:
-        users_dict = dict()
-        users_dict['ID'] = users_list[index]
-
-        index += 1
-        users_dict['User'] = users_list[index]
-
-        result.append(users_dict)
-        index += 1
+        result[users_list[index]] = users_list[index + 1]
+        index += 2
     return result

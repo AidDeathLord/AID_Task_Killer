@@ -118,4 +118,6 @@ open_button = Button(frame_bottom, text='Open', bg='#202020',
                      fg='#C0C0C0', command=open_server)
 open_button.place(x=180, y=10, height=26, width=60)
 
-servers_form.mainloop()
+
+if __name__ == '__main__':
+    servers_form.mainloop()
