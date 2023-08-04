@@ -119,5 +119,9 @@ open_button = Button(frame_bottom, text='Open', bg='#202020',
 open_button.place(x=180, y=10, height=26, width=60)
 
 
-if __name__ == '__main__':
+def main():
     servers_form.mainloop()
+
+
+if __name__ == '__main__':
+    main()
