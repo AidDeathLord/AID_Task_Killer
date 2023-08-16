@@ -1,19 +1,24 @@
 import subprocess
+from pathlib import Path
 from tkinter import *
 from tkinter import messagebox
 from task_killer.parser import open_server_file
-from task_killer.tasks_form import open_form
+from task_killer.tasks_form import open_tasks_form
+from task_killer.cache_form import open_cache_form
+
+
+PATH_TO_SRV_FILE = Path('server_list', 'servers.txt')
+PATH_TO_IMAGE = Path('image', 'logo.png')
 
 
 def add_server():
     new_server = server_entry.get()
-    server_list = open_server_file()
+    server_list = open_server_file(PATH_TO_SRV_FILE)
     if new_server in server_list:
-        open_form(new_server)
+        error_add_server()
     else:
         if add_srv_in_txt(new_server):
             server_listbox.insert(0, new_server)
-            open_form(new_server)
         else:
             error_add_server()
 
@@ -23,7 +28,7 @@ def add_srv_in_txt(new_server: str) -> bool:
         return False
     if subprocess.check_output(f"powershell.exe tnc {new_server} -I Quiet",
                                universal_newlines=True) == 'True\n':
-        server_file = open('server_list/servers.txt', 'a')
+        server_file = open(PATH_TO_SRV_FILE, 'a')
         server_file.writelines(f'{new_server}\n')
         return True
     return False
@@ -43,19 +48,27 @@ def del_server():
     server_listbox.delete(selection[0])
 
     # remove element from file
-    server_list = open_server_file()
+    server_list = open_server_file(PATH_TO_SRV_FILE)
     server_list.remove(str(selected_server))
-    server_file = open('server_list/servers.txt', 'w')
+    server_file = open(PATH_TO_SRV_FILE, 'w')
     for server in server_list:
         server_file.writelines(f'{server}\n')
 
 
-def open_server():
+def open_tasks():
     # remember the index of the selected element
     selection = server_listbox.curselection()
     # remember the content of the element
     selected_server = server_listbox.get(selection[0])
-    open_form(selected_server)
+    open_tasks_form(selected_server)
+
+
+def open_cache():
+    # remember the index of the selected element
+    selection = server_listbox.curselection()
+    # remember the content of the element
+    selected_server = server_listbox.get(selection[0])
+    open_cache_form(selected_server)
 
 
 # root this is our field
@@ -67,10 +80,10 @@ servers_form.title('ATK')  # title
 servers_form.geometry('+800+300')
 servers_form.resizable(width=False, height=False)
 
-icon = PhotoImage(file='image/logo.png')
+icon = PhotoImage(file=PATH_TO_IMAGE)
 servers_form.iconphoto(False, icon)
 
-canvas = Canvas(servers_form, height=370, width=246)
+canvas = Canvas(servers_form, height=440, width=246)
 canvas.pack()
 
 
@@ -99,7 +112,7 @@ frame_center = Frame(servers_form, bg="#606060")
 frame_center.place(relwidth=1, height=250, y=75)
 
 
-servers = Variable(value=open_server_file())
+servers = Variable(value=open_server_file(PATH_TO_SRV_FILE))
 server_listbox = Listbox(frame_center, listvariable=servers, bg="#202020",
                          bd=0, highlightbackground='#202020', fg='#C0C0C0',
                          font=30, selectbackground='#48BA6B')
@@ -108,15 +121,23 @@ server_listbox.place(height=230, width=230, x=10, y=10)
 
 # bottom panel
 frame_bottom = Frame(servers_form, bg="#202020")
-frame_bottom.place(relwidth=1, height=80, y=325)
+frame_bottom.place(relwidth=1, height=140, y=325)
 
 del_server_button = Button(frame_bottom, text='Delete', bg='#202020',
                            fg='#C0C0C0', command=del_server)
 del_server_button.place(x=10, y=10, height=26, width=60)
 
-open_button = Button(frame_bottom, text='Open', bg='#202020',
-                     fg='#C0C0C0', command=open_server)
-open_button.place(x=180, y=10, height=26, width=60)
+open_button = Button(frame_bottom, text='Open tasks', bg='#202020',
+                     fg='#C0C0C0', command=open_tasks)
+open_button.place(x=160, y=10, height=26, width=80)
+
+open_button = Button(frame_bottom, text='Clear cache', bg='#202020',
+                     fg='#C0C0C0', command=open_cache)
+open_button.place(x=160, y=46, height=26, width=80)
+
+open_button = Button(frame_bottom, text='Power', bg='#202020',
+                     fg='#C0C0C0', command=open_tasks)
+open_button.place(x=160, y=82, height=26, width=80)
 
 
 def main():

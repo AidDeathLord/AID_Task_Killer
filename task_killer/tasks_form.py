@@ -6,10 +6,10 @@ import subprocess
 
 def open_users(server):
     users_info = get_users(server)
-    return list(users_info.keys())
+    return sorted(list(users_info.keys()))
 
 
-def open_form(server):
+def open_tasks_form(server):
     def open_tasks():
         selection = users_listbox.curselection()
         # remember the content of the element
@@ -26,8 +26,7 @@ def open_form(server):
         selected_item = table.selection()[0]
         task = table.item(selected_item, option="values")
 
-        command = f'''powershell.exe $process = Get-Process -ID {task[1]} -ComputerName {server}\n
-                      Stop-Process -InputObject $process'''
+        command = f'taskkill /PID {task[1]} /S {server} /F'
         subprocess.call(command)
         table.delete(selected_item)
 
@@ -49,8 +48,8 @@ def open_form(server):
     task_form.geometry('+600+300')
     task_form.resizable(width=False, height=False)
 
-    icon = PhotoImage(file='image/logo.png')
-    task_form.iconphoto(False, icon)
+    # icon = PhotoImage(file='image/logo.png')
+    # task_form.iconphoto(False, icon)
 
     canvas = Canvas(task_form, height=430, width=600)
     canvas.pack()
